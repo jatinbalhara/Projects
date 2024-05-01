@@ -1,0 +1,544 @@
+import mysql.connector
+
+mydb=mysql.connector.connect(host="localhost", user="root", password="1234")
+print(mydb)
+
+print('''
+---------------Book My Movie---------------''')
+
+movie_1 = 'Art of racing in the rain'
+movie_2 = 'Me before you'
+movie_3 = 'Family'
+movie_4 = 'War'
+movie_5 = 'Avengers'
+
+snack_1 = 'Popcorn'
+snack_2 = 'Nachos'
+snack_3 = 'Cold drink'
+snack_4 = 'Meal'
+
+price_of_snack_1 = 150
+price_of_snack_2 = 200
+price_of_snack_3 = 50
+price_of_snack_4 = 350
+
+price_of_the_ticket = 100
+
+Total_ammount=0
+
+Coupon_code = '20perc'
+
+Discount = 0
+
+m = 1
+
+
+cur=mydb.cursor()
+
+try:
+    cur.execute("create database ab_Cinema")
+    seats_available = 200
+except :
+    print()
+
+cur.execute("use ab_Cinema")
+
+try:
+    cur.execute('create table movies_at_12pm (movie varchar(200), price INT, seats INT)')
+    cur.execute('insert into movies_at_12pm (movie, price, seats) values (%s, %s, %s)',(movie_1, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_12pm (movie, price, seats) values (%s, %s, %s)',(movie_2, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_12pm (movie, price, seats) values (%s, %s, %s)',(movie_3, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_12pm (movie, price, seats) values (%s, %s, %s)',(movie_4, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_12pm (movie, price, seats) values (%s, %s, %s)',(movie_5, price_of_the_ticket, seats_available))
+    
+    cur.execute('create table movies_at_4pm (movie varchar(200), price INT, seats INT)')
+    cur.execute('insert into movies_at_4pm (movie, price, seats) values (%s, %s, %s)',(movie_1, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_4pm (movie, price, seats) values (%s, %s, %s)',(movie_2, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_4pm (movie, price, seats) values (%s, %s, %s)',(movie_3, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_4pm (movie, price, seats) values (%s, %s, %s)',(movie_4, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_4pm (movie, price, seats) values (%s, %s, %s)',(movie_5, price_of_the_ticket, seats_available))
+    
+    cur.execute('create table movies_at_9pm (movie varchar(200), price INT, seats INT)')
+    cur.execute('insert into movies_at_9pm (movie, price, seats) values (%s, %s, %s)',(movie_1, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_9pm (movie, price, seats) values (%s, %s, %s)',(movie_2, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_9pm (movie, price, seats) values (%s, %s, %s)',(movie_3, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_9pm (movie, price, seats) values (%s, %s, %s)',(movie_4, price_of_the_ticket, seats_available))
+    cur.execute('insert into movies_at_9pm (movie, price, seats) values (%s, %s, %s)',(movie_5, price_of_the_ticket, seats_available))
+    
+    cur.execute('create table Snacks (name varchar(200), price INT)')
+    cur.execute('insert into Snacks (name , price) values (%s, %s)',(snack_1, price_of_snack_1))
+    cur.execute('insert into Snacks (name , price) values (%s, %s)',(snack_2, price_of_snack_2))
+    cur.execute('insert into Snacks (name , price) values (%s, %s)',(snack_3, price_of_snack_3))
+    cur.execute('insert into Snacks (name , price) values (%s, %s)',(snack_4, price_of_snack_4))
+
+except :
+    print()
+    
+mydb.commit()
+
+#Values taken from the tables
+
+cur.execute ("select seats from movies_at_12pm where movie = 'Art of racing in the rain'")
+b=cur.fetchone()
+for val in b:
+    seats_available_1 = int(val)
+
+cur.execute ("select seats from movies_at_12pm where movie = 'Me before you'")
+b=cur.fetchone()
+for val in b:
+    seats_available_2 = int(val)
+
+cur.execute ("select seats from movies_at_12pm where movie = 'Family'")
+b=cur.fetchone()
+for val in b:
+    seats_available_3 = int(val)
+
+cur.execute ("select seats from movies_at_12pm where movie = 'War'")
+b=cur.fetchone()
+for val in b:
+    seats_available_4 = int(val)
+
+cur.execute ("select seats from movies_at_12pm where movie = 'Avengers'")
+b=cur.fetchone()
+for val in b:
+    seats_available_5 = int(val)
+
+cur.execute ("select seats from movies_at_4pm where movie = 'Art of racing in the rain'")
+b=cur.fetchone()
+for val in b:
+    seats_available_6 = int(val)
+
+cur.execute ("select seats from movies_at_4pm where movie = 'Me before you'")
+b=cur.fetchone()
+for val in b:
+    seats_available_7 = int(val)
+
+cur.execute ("select seats from movies_at_4pm where movie = 'Family'")
+b=cur.fetchone()
+for val in b:
+    seats_available_8 = int(val)
+
+cur.execute ("select seats from movies_at_4pm where movie = 'War'")
+b=cur.fetchone()
+for val in b:
+    seats_available_9 = int(val)
+
+cur.execute ("select seats from movies_at_4pm where movie = 'Avengers'")
+b=cur.fetchone()
+for val in b:
+    seats_available_10 = int(val)
+
+cur.execute ("select seats from movies_at_9pm where movie = 'Art of racing in the rain'")
+b=cur.fetchone()
+for val in b:
+    seats_available_11 = int(val)
+
+cur.execute ("select seats from movies_at_9pm where movie = 'Me before you'")
+b=cur.fetchone()
+for val in b:
+    seats_available_12 = int(val)
+
+cur.execute ("select seats from movies_at_9pm where movie = 'Family'")
+b=cur.fetchone()
+for val in b:
+    seats_available_13 = int(val)
+
+cur.execute ("select seats from movies_at_9pm where movie = 'War'")
+b=cur.fetchone()
+for val in b:
+    seats_available_14 = int(val)
+
+cur.execute ("select seats from movies_at_9pm where movie = 'Avengers'")
+b=cur.fetchone()
+for val in b:
+    seats_available_15 = int(val)
+
+
+
+print('''
+----------Movies Available----------
+''')
+
+cur.execute("select * from movies_at_12pm")
+a=cur.fetchall()
+for row in a:
+    print("Movie = ", row[0])
+    print("Price = ", row[1])
+    print()
+
+
+
+booking = input('''
+Enter the name of the movie you want to watch (lower case)
+: ''')
+
+
+if booking == 'art of racing in the rain':
+
+    seats = int(input('''
+Enter the number of seats you want to book
+: '''))
+
+    time = input('''
+At what time would you like to watch it
+
+12 = 12 pm
+4 = 4 pm
+9 = 9 pm
+: ''')
+
+    if time == '12':
+        seats_available_1 = seats_available_1 - seats
+        if seats_available_1 >= 0:
+            cur.execute("Update movies_at_12pm set seats = %s where movie = %s",(seats_available_1, movie_1))
+            mydb.commit()
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_1 + seats)
+            m=0
+    else:
+        print("No shows available at this time")
+        m=0
+        
+    elif time == '4':
+        seats_available_6 = seats_available_6 - seats
+        if seats_available_6 >= 0:
+            cur.execute("Update movies_at_4pm set seats = %s where movie = %s",(seats_available_6, movie_1))
+            mydb.commit()
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_6 + seats)
+            m=0
+    else:
+        print("No shows available at this time")
+        m=0
+        
+    elif time == '9':
+        seats_available_11 = seats_available_11 - seats
+        if seats_available_11 >= 0:
+            cur.execute("Update movies_at_9pm set seats = %s where movie = %s",(seats_available_11, movie_1))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_11 + seats)
+            m=0
+
+    else:
+        print("No shows available at this time")
+        m=0
+                
+
+    
+elif booking == "me before you":
+
+    seats = int(input('''
+Enter the number of seats you want to book
+: '''))
+
+
+    time = input('''
+At what time would you like to watch it
+
+12 = 12 pm
+4 = 4 pm
+9 = 9 pm
+: ''')
+
+    if time == '12':
+        seats_available_2 = seats_available_2 - seats
+        if seats_available_2 >= 0:
+            cur.execute("Update movies_at_12pm set seats = %s where movie = %s",(seats_available_2, movie_2))
+            mydb.commit()
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_2 + seats)
+            m=0
+    else:
+        print("No shows available at this time")
+        m=0
+        
+    elif time == '4':
+        seats_available_7 = seats_available_7 - seats
+        if seats_available_7 >= 0:
+            cur.execute("Update movies_at_4pm set seats = %s where movie = %s",(seats_available_7, movie_2))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_7 + seats)
+            m=0
+    else:
+        print("No shows available at this time")
+        m=0
+
+    elif time == '9':
+        seats_available_12 = seats_available_12 - seats
+        if seats_available_12 >= 0:
+            execute("Update movies_at_9pm set seats = %s where movie = %s",(seats_available_12, movie_2))
+            mydb.commit()
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_12 + seats)
+            m=0
+    else:
+        print("No shows available at this time")
+        m=0
+elif booking == "family":
+
+    seats = int(input('''
+Enter the number of seats you want to book
+: '''))
+
+    time = input('''
+At what time would you like to watch it
+
+12 = 12 pm
+4 = 4 pm
+9 = 9 pm
+: ''')
+
+    if time == '12':
+        seats_available_3 = seats_available_3 - seats
+        if seats_available_3 >= 0:
+            cur.execute("Update movies_at_12pm set seats = %s where movie = %s",(seats_available_3, movie_3))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_3 + seats)
+            m=0
+
+    else:
+        print("No shows available at this time")
+        m=0
+
+    elif time == '4':
+        seats_available_8 = seats_available_8 - seats
+        if seats_available_8 >= 0:
+            cur.execute("Update movies_at_4pm set seats = %s where movie = %s",(seats_available_8, movie_3))
+            mydb.commit()
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_8 + seats)
+            m=0
+
+    else:
+        print("No shows available at this time")
+        m=0
+
+    elif time == '9':
+        seats_available_13 = seats_available_13 - seats
+        if seats_available_13 >= 0:
+            cur.execute("Update movies_at_9pm set seats = %s where movie = %s",(seats_available_13, movie_3))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_13 + seats)
+            m=0
+
+    else:
+        print("No shows available at this time")
+        m=0    
+elif booking == "war":
+
+    seats = int(input('''
+Enter the number of seats you want to book
+: '''))
+
+    time = input('''
+At what time would you like to watch it
+
+12 = 12 pm
+4 = 4 pm
+9 = 9 pm
+: ''')
+
+    if time == '12':
+        seats_available_4 = seats_available_4 - seats
+        if seats_available_4 >= 0:
+            cur.execute("Update movies_at_12pm set seats = %s where movie = %s",(seats_available_4, movie_4))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_4 + seats)
+            m=0
+
+    else:
+        print("No shows available at this time")
+        m=0
+
+    elif time == '4':
+        seats_available_9 = seats_available_9 - seats
+        if seats_available_9 >= 0:
+            cur.execute("Update movies_at_4pm set seats = %s where movie = %s",(seats_available_9, movie_4))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_9 + seats)
+            m=0
+
+     else:
+        print("No shows available at this time")
+        m=0
+
+    elif time == '9':
+        seats_available_14 = seats_available_14 - seats
+        if seats_available_14 >= 0:
+            cur.execute("Update movies_at_9pm set seats = %s where movie = %s",(seats_available_14, movie_4))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_14 + seats)
+            m=0
+    else:
+        print("No shows available at this time")
+        m=0
+elif booking == "avengers":
+
+    seats = int(input('''
+Enter the number of seats you want to book
+: '''))
+
+    time = input('''
+At what time would you like to watch it
+
+12 = 12 pm
+4 = 4 pm
+9 = 9 pm
+: ''')
+
+    if time == '12':
+        seats_available_5 = seats_available_5 - seats
+        if seats_available_5 >= 0:
+            cur.execute("Update movies_at_12pm set seats = %s where movie = %s",(seats_available_5, movie_5))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_5 + seats)
+            m=0
+
+    else:
+        print("No shows available at this time")
+        m=0
+
+    elif time == '4':
+        seats_available_10 = seats_available_10 - seats
+        if seats_available_10 >= 0:
+            cur.execute("Update movies_at_4pm set seats = %s where movie = %s",(seats_available_10, movie_5))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_10 + seats)
+            m=0
+
+    else:
+        print("No shows available at this time")
+        m=0
+
+    elif time == '9':
+        seats_available_15 = seats_available_15 - seats
+        if seats_available_15 >= 0:
+            cur.execute("Update movies_at_9pm set seats = %s where movie = %s",(seats_available_15, movie_5))
+            mydb.commit()
+
+        else:
+            print("You are selecting more seats than there are available")
+            print("Seats remaining :" , seats_available_15 + seats)
+            m=0
+    else:
+        print("No shows available at this time")
+        m=0
+if m == 1:
+    Total_ammount = Total_ammount + price_of_the_ticket * seats
+    print ("Current ammount you have to pay: ", Total_ammount)
+
+    order = input('''
+Do you want to be served with snacks during the movie? (yes/no)
+: ''')
+
+    if order == 'yes':
+        print('''
+    ------Menu------
+    ''')
+        cur.execute("select * from Snacks")
+        a=cur.fetchall()
+
+        for row in a:
+            print(row[0])
+            print(row[1])
+            print()
+     
+        choice = ''
+
+        while choice != "no":
+
+            choice = input('''
+What do you want to order? (lower case)
+-> ''')
+         
+            if choice == 'popcorn':
+                qty_to_order = int(input('''
+Quantity to order (1,2,3...)
+-> '''))
+                Total_ammount = Total_ammount + qty_to_order * price_of_snack_1
+
+            elif choice == 'nachos':
+                qty_to_order = int(input('''
+Quantity to order (1,2,3...)
+-> '''))
+                Total_ammount = Total_ammount + qty_to_order * price_of_snack_2
+
+            elif choice == 'cold drink':
+                qty_to_order = int(input('''
+Quantity to order (1,2,3...)
+-> '''))
+                Total_ammount = Total_ammount + qty_to_order * price_of_snack_3
+
+            elif choice == 'meal':
+                qty_to_order = int(input('''
+Quantity to order (1,2,3...)
+-> '''))
+                Total_ammount = Total_ammount + qty_to_order * price_of_snack_4
+
+            else:
+                print("Sorry we do not have a meal of this name.....")
+                m=0
+                
+            choice = input('''
+Do you want to add more snacks?
+If yes press enter, if no type "no"
+-> ''')
+
+
+    elif order == 'no':
+        print("")
+
+    print('''Your Current total is''', Total_ammount)
+    choice_3 = input('''Would you like to apply a coupon code for a 20% discount (yes/no)
+''')
+    
+    if choice_3 == 'yes':
+        Apply_coupon = input("Enter the coupon code :")
+    
+        if Apply_coupon == '20perc':
+            Discount = Total_ammount / 5
+            print("You got a discount of", Discount, "rupees")
+            Total_ammount = Total_ammount - Discount
+            print("Your grand total is", Total_ammount)
+
+        else:
+            print("The discount coupon is wrong")
+            print("Your grand total is", Total_ammount)
+            m=0
+    elif choice_3 == 'no':
+        print("Your grand total is", Total_ammount, "Rs")
+    
+        
+print(input("Press enter to exit"))
