@@ -1,0 +1,212 @@
+#Private information such as channel id and api keys are removed from the code
+import googleapiclient.discovery
+from pytube import YouTube # type: ignore
+import logging
+from moviepy.editor import VideoFileClip, AudioFileClip, concatenate_videoclips
+import os
+
+
+# Replace with your API key
+API_KEY = ''
+CHANNEL_ID = ''
+
+def get_second_oldest_video(channel_id, api_key):
+    try:
+        youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
+        
+        # Fetch the channel's uploads playlist ID
+        request = youtube.channels().list(
+            part="contentDetails",
+            id=channel_id
+        )
+        response = request.execute()
+        
+        if 'items' not in response or not response['items']:
+            logging.error("No items found in the channel details response.")
+            return None
+
+        uploads_playlist_id = response["items"][0]["contentDetails"]["relatedPlaylists"]["uploads"]
+
+        # Fetch all videos in the uploads playlist
+        videos = []
+        next_page_token = None
+        while True:
+            request = youtube.playlistItems().list(
+                part="snippet",
+                playlistId=uploads_playlist_id,
+                maxResults=50,
+                pageToken=next_page_token
+            )
+            response = request.execute()
+            
+            if 'items' not in response or not response['items']:
+                logging.error("No items found in the playlist items response.")
+                break
+
+            videos += response["items"]
+            next_page_token = response.get("nextPageToken")
+            if not next_page_token:
+                break
+        
+        # Sort videos by published date
+        videos_sorted = sorted(videos, key=lambda v: v["snippet"]["publishedAt"])
+
+        # Check if there are at least two videos
+        if len(videos_sorted) < 2:
+            logging.error("Less than two videos found in the playlist.")
+            return None
+
+        # Select the second oldest video
+        second_oldest_video = videos_sorted[1]
+        video_id = second_oldest_video["snippet"]["resourceId"]["videoId"]
+        video_url = f"https://www.youtube.com/watch?v={video_id}"
+        
+        logging.info(f"Second oldest video URL: {video_url}")  # Debug info
+        return video_url
+    except Exception as e:
+        logging.error(f"An error occurred while fetching the second oldest video: {e}")
+        return None
+
+def download_video(url, output_path, filename):
+    try:
+        # Create a YouTube object
+        yt = YouTube(url)
+        
+        # Try to get a combined stream with both video and audio
+        stream = yt.streams.filter(progressive=True, file_extension='mp4', res="1080p").first()
+        
+        if stream is None:
+            print("1080p combined stream not available. Attempting to download video and audio separately.")
+            
+            # Select the highest resolution video-only stream available
+            video_stream = yt.streams.filter(adaptive=True, file_extension='mp4', only_video=True).order_by('resolution').desc().first()
+            
+            # Select the audio stream
+            audio_stream = yt.streams.filter(adaptive=True, file_extension='mp4', only_audio=True).order_by('abr').desc().first()
+            
+            if video_stream is None or audio_stream is None:
+                raise ValueError("No available video or audio streams found.")
+            
+            # Download the video stream
+            video_file = video_stream.download(output_path=output_path, filename='video_temp.mp4')
+            
+            # Download the audio stream
+            audio_file = audio_stream.download(output_path=output_path, filename='audio_temp.mp4')
+            
+            # Merge the video and audio streams using moviepy
+            video_clip = VideoFileClip(video_file)
+            audio_clip = AudioFileClip(audio_file)
+            
+            final_clip = video_clip.set_audio(audio_clip)
+            final_output_path = f"{output_path}/{filename}"
+            final_clip.write_videofile(final_output_path, codec="libx264", audio_codec="aac")
+            
+            # Close the clips
+            video_clip.close()
+            audio_clip.close()
+            
+            # Delete temporary files
+            os.remove(video_file)
+            os.remove(audio_file)
+            
+        else:
+            # Download the combined stream
+            stream.download(output_path=output_path, filename=filename)
+        
+        print("Download completed!")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+def main():
+    channel_id = CHANNEL_ID
+    api_key = API_KEY
+    
+    # Get the oldest video URL
+    video_url = get_second_oldest_video(channel_id, api_key)
+    print(f"Video URL: {video_url}")
+    output_path = ''
+    filename = ''
+    
+    # Download the video
+    download_video(video_url, output_path, filename)
+    
+    from Editing import crop_and_format_for_reel
+if __name__ == "__main__":
+    main()
+
+from moviepy.editor import VideoFileClip, CompositeVideoClip, ColorClip
+from moviepy.video.fx.all import crop, resize
+import PIL
+
+def crop_and_format_for_reel(input_path, reel_output_path):
+    # Load the video
+    video = VideoFileClip(input_path)
+    video = video.subclip(0, 60)
+
+    # Define the size of the square (smallest dimension of the video)
+    square_size = min(video.size)
+    
+    # Crop the video to a square in the center
+    cropped_video = crop(
+        video,
+        width=int(square_size),
+        height=int(square_size),
+        x_center=int(video.w / 2),
+        y_center=int(video.h / 2)
+    )
+    
+    # Resize the cropped square video to fit the width of the reel format (1080 pixels)
+    resized_video = resize(cropped_video, width=1080)
+    
+    # Calculate the height of the reel format (1920 pixels)
+    reel_height = 1920
+    
+    # Create a new clip with black background of the reel size
+    black_background = ColorClip(size=(1080, reel_height), color=(0, 0, 0), duration=video.duration)
+    
+    # Overlay the resized video on the black background, centered vertically
+    final_video = CompositeVideoClip([black_background, resized_video.set_position(('center', 'center'))])
+    
+    # Save the final video
+    final_video.write_videofile(edited_output_path, codec="libx264")
+
+# Example usage
+input_path = ''
+edited_output_path = ''
+
+crop_and_format_for_reel(input_path, edited_output_path)
+
+import requests
+
+def upload_facebook_reel(page_id, access_token, video_file_path, description):
+    url = f"https://graph-video.facebook.com/v17.0/{page_id}/videos"
+    
+    # Prepare the video file
+    files = {
+        'file': open(video_file_path, 'rb')
+    }
+    
+    # Metadata of the video
+    params = {
+        'access_token': access_token,
+        'description': description,
+        'title': 'Reel Title',  # Optional: Add a title
+        'published': 'true',  # Set to 'false' if you want to upload as draft
+    }
+    
+    # Post the video
+    response = requests.post(url, params=params, files=files)
+    
+    # Check the response
+    if response.status_code == 200:
+        print("Video uploaded successfully:", response.json())
+    else:
+        print("Error uploading video:", response.status_code, response.text)
+
+if __name__ == "__main__":
+    page_id = ""  # Replace with your Facebook Page ID
+    access_token = ""  # Replace with your Facebook Page Access Token
+    video_file_path = ""
+    description = ""
+    
+    upload_facebook_reel(page_id, access_token, video_file_path, description)
